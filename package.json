@@ -1,0 +1,61 @@
+{
+  "name": "form-ctrl-react",
+  "description": "Form control Map for multiple forms with field values, state, validation. React edition.",
+  "private": false,
+  "type": "module",
+  "version": "0.5.0",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./*": {
+      "types": "./src/*.d.ts",
+      "default": "./src/*.js"
+    }
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=12.20.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/applecube/form-ctrl-react.git"
+  },
+  "keywords": [
+    "form",
+    "ctrl",
+    "control",
+    "multiple",
+    "fields",
+    "state",
+    "store",
+    "react"
+  ],
+  "author": "Alexander Lipatov",
+  "contributors": [],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/applecube/form-ctrl-react/issues"
+  },
+  "homepage": "https://github.com/applecube/form-ctrl-react",
+  "devDependencies": {
+    "eslint": "^9.20.1",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "globals": "^15.15.0",
+    "prettier": "^3.5.1",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.0"
+  },
+  "dependencies": {
+    "form-ctrl-vanilla": "^0.7.1",
+    "zustand": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@types/react": ">=18.0.0",
+    "react": ">=18.0.0"
+  }
+}
