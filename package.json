@@ -1,29 +1,8 @@
 {
   "name": "form-ctrl-react",
-  "description": "Form control Map for multiple forms with field values, state, validation. React edition.",
+  "version": "0.6.0",
   "private": false,
-  "type": "module",
-  "version": "0.5.0",
-  "main": "./index.js",
-  "types": "./index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./index.d.ts",
-      "default": "./index.js"
-    },
-    "./*": {
-      "types": "./src/*.d.ts",
-      "default": "./src/*.js"
-    }
-  },
-  "sideEffects": false,
-  "engines": {
-    "node": ">=12.20.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/applecube/form-ctrl-react.git"
-  },
+  "description": "Form control Map for multiple forms with field values, state, validation. React edition.",
   "keywords": [
     "form",
     "ctrl",
@@ -34,13 +13,57 @@
     "store",
     "react"
   ],
-  "author": "Alexander Lipatov",
-  "contributors": [],
-  "license": "MIT",
+  "homepage": "https://github.com/applecube/form-ctrl-react",
   "bugs": {
     "url": "https://github.com/applecube/form-ctrl-react/issues"
   },
-  "homepage": "https://github.com/applecube/form-ctrl-react",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/applecube/form-ctrl-react.git"
+  },
+  "license": "MIT",
+  "author": "Alexander Lipatov",
+  "contributors": [],
+  "sideEffects": false,
+  "type": "commonjs",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "types": "./esm/index.d.ts",
+        "default": "./esm/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./*": {
+      "import": {
+        "types": "./esm/*.d.ts",
+        "default": "./esm/*.js"
+      },
+      "require": {
+        "types": "./dist/*.d.ts",
+        "default": "./dist/*.js"
+      }
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "esm"
+  ],
+  "scripts": {
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "rm -rf dist && tsc",
+    "build:esm": "rm -rf esm && tsc --module esnext --moduleResolution bundler --outDir esm"
+  },
+  "dependencies": {
+    "form-ctrl-vanilla": "^0.7.1",
+    "zustand": "^5.0.0"
+  },
   "devDependencies": {
     "eslint": "^9.20.1",
     "eslint-config-prettier": "^10.0.1",
@@ -50,12 +73,11 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.24.0"
   },
-  "dependencies": {
-    "form-ctrl-vanilla": "^0.7.1",
-    "zustand": "^5.0.0"
-  },
   "peerDependencies": {
     "@types/react": ">=18.0.0",
     "react": ">=18.0.0"
+  },
+  "engines": {
+    "node": ">=12.20.0"
   }
 }

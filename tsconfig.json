@@ -1,20 +1,29 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "strict": true,
+    "lib": [
+      "dom",
+      "esnext"
+    ],
+    "baseUrl": ".",
+    "outDir": "dist",
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "jsx": "react-jsx",
+    "strict": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "verbatimModuleSyntax": true,
+    "exactOptionalPropertyTypes": false,
+    "verbatimModuleSyntax": false,
     "declaration": true,
     "isolatedDeclarations": true,
-    "noEmit": true,
-    "baseUrl": "."
+    "sourceMap": true,
+    "noEmit": false
   },
+  "include": [
+    "src"
+  ],
   "exclude": [
     "node_modules"
   ]
