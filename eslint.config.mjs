@@ -37,6 +37,6 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['node_modules', 'dist', 'esm'],
+    ignores: ['node_modules', 'dist', '.tshy*'],
   },
 );

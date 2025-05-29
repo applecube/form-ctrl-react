@@ -1,4 +1,4 @@
-import { FormCtrl, type FormId, type FormConstructorOptions } from './FormCtrl';
+import { FormCtrl, type FormId, type FormConstructorOptions } from './FormCtrl.js';
 
 interface FormCtrlFunction {
   (formId: FormId): FormCtrl;
@@ -22,7 +22,8 @@ export const formCtrl: FormCtrlFunction = (formId) => {
 
 formCtrl.create = (formId, options) => new FormCtrl(formId, options);
 
-formCtrl.ensure = (formId, options) => FormCtrl.get<FormCtrl>(formId) || new FormCtrl(formId, options);
+formCtrl.ensure = (formId, options) =>
+  FormCtrl.get<FormCtrl>(formId) || new FormCtrl(formId, options);
 
 formCtrl.get = (formId) => FormCtrl.get<FormCtrl>(formId);
 

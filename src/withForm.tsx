@@ -8,19 +8,17 @@ import {
   type FormFieldRequiredValidate,
   type FormFieldValidation,
   type FormId,
-} from './FormCtrl';
-import { useValueChanged } from './utils';
+} from './FormCtrl.js';
+import { useValueChanged } from './utils.js';
 
-export interface FormFieldChildBaseProps {
+export interface ChildBaseProps {
   name?: string;
   required?: boolean;
   onChange?: (e: unknown) => void;
-  onBlur?: (e: unknown) => void;
+  onBlur?: (e?: unknown) => void;
 }
 
-export interface FormFieldControlledChildBaseProps<V = unknown>
-  extends FormFieldBaseProps,
-    FormFieldData<V> {}
+export interface ControlledChildBaseProps<V = unknown> extends ChildBaseProps, FormFieldData<V> {}
 
 export interface FormFieldBaseProps {
   /**
@@ -34,14 +32,14 @@ export interface FormFieldBaseProps {
   validation?: FormFieldValidation;
   messages?: FormFieldMessage[];
 
-  // intersection with FormFieldChildBaseProps
+  // intersection with ChildBaseProps
   /**
    * Will be passed to child `name` prop. If not specified - `field` will be passed.
    */
   name?: string;
   required?: FormFieldRequired;
   onChange?: (e: unknown) => void;
-  onBlur?: (e: unknown) => void;
+  onBlur?: (e?: unknown) => void;
 }
 
 export interface WithFormParams extends FormFieldBaseProps {
@@ -50,20 +48,34 @@ export interface WithFormParams extends FormFieldBaseProps {
 
 type ChildComponent<P> = React.ComponentType<P> | React.ForwardRefExoticComponent<P>;
 
-type FormFieldChildBasePassedProps<P> = Omit<P, keyof FormFieldBaseProps | keyof FormFieldChildBaseProps> &
-  FormFieldChildBaseProps;
+type FormFieldProps<P> = Omit<P, keyof FormFieldBaseProps | keyof ChildBaseProps> &
+  FormFieldBaseProps;
 
-type FormFieldProps<P> = Omit<P, keyof FormFieldBaseProps> & FormFieldBaseProps;
+type FormFieldControlledProps<P> = Omit<
+  P,
+  keyof FormFieldBaseProps | keyof ControlledChildBaseProps
+> &
+  FormFieldBaseProps;
 
 type FormFieldComponent<P> = React.ForwardRefExoticComponent<
   React.PropsWithoutRef<FormFieldProps<P>> &
-    React.RefAttributes<React.ComponentRef<ChildComponent<FormFieldChildBasePassedProps<P>>>>
+    React.RefAttributes<React.ComponentRef<ChildComponent<P>>>
+>;
+
+type FormFieldControlledComponent<P> = React.ForwardRefExoticComponent<
+  React.PropsWithoutRef<FormFieldControlledProps<P>> &
+    React.RefAttributes<React.ComponentRef<ChildComponent<P>>>
 >;
 
 const useFieldForm = <P extends FormFieldBaseProps>(
   props: P,
   params: WithFormParams,
-): { form: FormCtrl; field: FormField; childBaseProps: FormFieldChildBasePassedProps<P> } => {
+): {
+  form: FormCtrl;
+  field: FormField;
+  childBaseProps: ChildBaseProps;
+  otherChildProps: Omit<P, keyof FormFieldBaseProps>;
+} => {
   const {
     form: formProp = params.form,
     field: fieldProp = params.field,
@@ -73,12 +85,12 @@ const useFieldForm = <P extends FormFieldBaseProps>(
     validation = params.validation,
     onChange: onChangeProp,
     onBlur: onBlurProp,
-    ...otherProps
+    ...otherChildProps
   } = props;
 
   const field = fieldProp || '_unknown_field_';
 
-  const formRef = React.useRef<FormCtrl>(null);
+  const formRef = React.useRef<FormCtrl | undefined>();
   if (!formRef.current) {
     formRef.current =
       formProp instanceof FormCtrl
@@ -90,7 +102,12 @@ const useFieldForm = <P extends FormFieldBaseProps>(
     const form = formRef.current;
 
     if (messages) form.resetFieldMessages(field, messages, { skipRerender: true });
-    form.setFieldValidation(field, { requiredValidate: params.requiredValidate, ...validation, required });
+
+    form.setFieldValidation(field, {
+      requiredValidate: params.requiredValidate,
+      ...validation,
+      required,
+    });
   }
   const form = formRef.current;
 
@@ -115,15 +132,14 @@ const useFieldForm = <P extends FormFieldBaseProps>(
     form.handleBlur(field);
   };
 
-  const childBaseProps: FormFieldChildBasePassedProps<P> = {
-    ...otherProps,
+  const childBaseProps: ChildBaseProps = {
     name: String(name || field),
     required: Boolean(required),
     onChange,
     onBlur,
   };
 
-  return { form, field, childBaseProps };
+  return { form, field, childBaseProps, otherChildProps };
 };
 
 /**
@@ -131,17 +147,17 @@ const useFieldForm = <P extends FormFieldBaseProps>(
  *
  * Component should not have reserved props such as `form`, `field`, `messages`, `validation`.
  */
-export const withForm = <P extends FormFieldChildBaseProps>(
-  Component: ChildComponent<FormFieldChildBasePassedProps<P>>,
+export const withForm = <P extends ChildBaseProps>(
+  Component: ChildComponent<P>,
   params: WithFormParams = {},
 ): FormFieldComponent<P> => {
   const FormField: FormFieldComponent<P> = React.forwardRef<
     React.ComponentRef<typeof Component>,
     FormFieldProps<P>
   >(function FormField(props, ref) {
-    const { childBaseProps } = useFieldForm(props, params);
+    const { childBaseProps, otherChildProps } = useFieldForm(props, params);
 
-    return <Component {...(childBaseProps as any)} ref={ref} />;
+    return <Component {...(otherChildProps as unknown as P)} {...childBaseProps} ref={ref} />;
   });
 
   return FormField;
@@ -156,19 +172,26 @@ export const withForm = <P extends FormFieldChildBaseProps>(
  *
  * Component should have injected props such as `value`, `messages`, `error`, `warning`, `required`.
  */
-export const withFormControlled = <P extends FormFieldControlledChildBaseProps>(
-  Component: ChildComponent<FormFieldChildBasePassedProps<P>>,
+export const withFormControlled = <V, P extends ControlledChildBaseProps<V>>(
+  Component: ChildComponent<P>,
   params: WithFormParams = {},
-): FormFieldComponent<P> => {
-  const FormField: FormFieldComponent<P> = React.forwardRef<
+): FormFieldControlledComponent<P> => {
+  const FormField: FormFieldControlledComponent<P> = React.forwardRef<
     React.ComponentRef<typeof Component>,
-    FormFieldProps<P>
+    FormFieldControlledProps<P>
   >(function FormField(props, ref) {
-    const { form, field, childBaseProps } = useFieldForm(props, params);
+    const { form, field, childBaseProps, otherChildProps } = useFieldForm(props, params);
 
-    const fieldData = form.useFieldData(field);
+    const fieldData = form.useFieldData<V>(field);
 
-    return <Component {...(childBaseProps as any)} {...fieldData} ref={ref} />;
+    return (
+      <Component
+        {...(otherChildProps as unknown as P)}
+        {...childBaseProps}
+        {...fieldData}
+        ref={ref}
+      />
+    );
   });
 
   return FormField;

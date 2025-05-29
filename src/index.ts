@@ -1,2 +1,2 @@
-export * from './formCtrlFunction';
-export * from './FormCtrl';
+export * from './formCtrlFunction.js';
+export * from './FormCtrl.js';

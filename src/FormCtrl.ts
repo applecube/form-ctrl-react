@@ -1,10 +1,14 @@
-import { useStore } from 'zustand';
+import { useStore, type StoreApi } from 'zustand';
 import { createStore } from 'zustand/vanilla';
-import { FormCtrl as FormCtrlVanilla } from 'form-ctrl-vanilla/FormCtrl';
-import { ensureArray } from 'form-ctrl-vanilla/utils';
 
-import type { FormConstructorOptions, FormField, FormFieldData, FormId } from 'form-ctrl-vanilla/FormCtrl';
-import type { StoreApi } from 'zustand';
+import {
+  FormCtrl as FormCtrlVanilla,
+  type FormConstructorOptions,
+  type FormField,
+  type FormFieldData,
+  type FormId,
+} from 'form-ctrl-vanilla';
+import { ensureArray } from 'form-ctrl-vanilla/utils';
 
 type RerenderStoreApi = StoreApi<Record<FormField, number | undefined>>;
 
@@ -37,11 +41,10 @@ export class FormCtrl extends FormCtrlVanilla {
     return useStore(this._rerenderStore, (storeState) => storeState[field]);
   }
 
-  useFieldData(field: FormField): FormFieldData {
+  useFieldData<V = unknown>(field: FormField): FormFieldData<V> {
     this.useFieldRerender(field);
-    return this.getFieldData(field);
+    return this.getFieldData<V>(field);
   }
 }
 
-// must be at the end so FormCtrl above is exported instead of vanilla FormCtrl
-export type * from 'form-ctrl-vanilla/FormCtrl';
+export type * from 'form-ctrl-vanilla/types';

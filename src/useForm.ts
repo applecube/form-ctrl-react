@@ -1,6 +1,6 @@
 import React from 'react';
-import { FormCtrl, type FormId, type FormConstructorOptions, type FormValues } from './FormCtrl';
-import { useValueChanged } from './utils';
+import { FormCtrl, type FormId, type FormConstructorOptions, type FormValues } from './FormCtrl.js';
+import { useValueChanged } from './utils.js';
 
 export const useForm = (
   formId: FormId,
